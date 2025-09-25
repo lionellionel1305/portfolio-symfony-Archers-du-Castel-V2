@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Contact{% endblock %}
+
+{% block body %}
+<div class="container mt-5"><br><br>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0" style="font-size:1.8rem;">Contactez-nous</h4>
+                </div>
+                <div class="card-body">
+                    {# Affichage des messages flash #}
+                    {% for label, messages in app.flashes %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ label == 'error' ? 'danger' : 'success' }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+
+                    <form method="post" action="{{ path('app_contact') }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('contact_form') }}">
+
+                        <div class="mb-3">
+                            <label for="nom" class="form-label">Nom</label>
+                            <input  style="font-size:2.3rem" type="text" id="nom" name="nom" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input style="font-size:2.3rem" type="email" id="email" name="email" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea style="font-size:2.3rem" id="message" name="message" class="form-control" rows="5" required></textarea>
+                        </div>
+
+                        <div class="form-check mb-3" style="font-size:2.3rem" >
+                            <input type="checkbox"  id="consent" name="consent" value="1" class="form-check-input"  required>
+                            <label class="form-check-label" for="consent" style="font-size:2.3rem">
+                                J'accepte que mes données soient utilisées conformément au RGPD.
+                            </label>
+                        </div>
+<br><br>
+                        <button type="submit" class="btn btn-primary w-100" style="font-size:2.3rem">Envoyer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

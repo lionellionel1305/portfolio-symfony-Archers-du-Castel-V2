@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ album.name }}{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h2>📂 {{ album.name }}</h2>
+    <p>Créé le {{ album.createdAt|date('d/m/Y H:i') }}</p>
+
+    <div class="row">
+        {% if album.files is not empty %}
+            {% for file in album.files %}
+                <div class="col-md-3 mb-3">
+                    <div class="card">
+                        <img src="{{ asset('uploads/albums/' ~ file) }}" class="card-img-top" alt="">
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Aucune photo dans cet album.</p>
+        {% endif %}
+    </div>
+
+    <a href="{{ path('app_photos') }}" class="btn btn-secondary mt-3">Retour aux albums</a>
+</div>
+{% endblock %}
+
+

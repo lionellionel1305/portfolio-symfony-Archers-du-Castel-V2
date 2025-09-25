@@ -1,0 +1,13 @@
+{# templates/bundles/TwigBundle/Exception/error.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Erreur{% endblock %}
+
+{% block body %}
+    <div style="text-align:center; margin-top: 100px;">
+        <h1>Oups !</h1>
+        <p>La page demandée n’existe pas ou une erreur est survenue.</p>
+        <p><strong>{{ status_code }}</strong> – {{ status_text }}</p>
+        <a href="{{ path('app_home') }}">⬅ Retour à l’accueil</a>
+    </div>
+{% endblock %}

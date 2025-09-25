@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Galerie des albums{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h2>📸 Albums</h2>
+
+    <div class="row">
+        {% for album in albums %}
+            <div class="col-md-3 mb-4">
+                <div class="card">
+                    {% if album.files is not empty %}
+                        <a href="{{ path('album_show', {'id': album.id}) }}">
+                            <img src="{{ asset('uploads/albums/' ~ album.files|first) }}" class="card-img-top" alt="{{ album.name }}">
+                        </a>
+                    {% else %}
+                        <img src="{{ asset('uploads/albums/default.png') }}" class="card-img-top" alt="Pas de photo">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ album.name }}</h5>
+                        <p class="card-text">{{ album.files|length }} photo(s)</p>
+                        <a href="{{ path('album_show', {'id': album.id}) }}" class="btn btn-primary btn-sm">Voir l'album</a>
+
+                        {% if app.user is not null and is_granted('ROLE_ADMIN') %}
+                           
+
+                                <form action="{{ path('album_delete', {'id': album.id}) }}" method="post" onsubmit="return confirm('Supprimer cet album ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ album.id) }}">
+                                    <button class="btn btn-danger btn-sm">🗑 Supprimer</button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <p>Aucun album pour le moment.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

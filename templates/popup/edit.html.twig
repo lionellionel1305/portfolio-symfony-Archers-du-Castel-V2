@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Modifier le popup</h3>
+        </div>
+        <div class="card-body">
+            {{ form_start(form) }}
+                <div class="mb-3">
+                    {{ form_label(form.enabled, 'Activer le popup', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.enabled, {'attr': {'class': 'form-check-input'}}) }}
+                    {{ form_errors(form.enabled) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.content, 'Contenu du popup', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.content, {'attr': {'class': 'form-control', 'rows': 5}}) }}
+                    {{ form_errors(form.content) }}
+                </div>
+
+                <button type="submit" class="btn btn-success">Enregistrer</button>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

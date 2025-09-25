@@ -1,0 +1,82 @@
+{% extends 'base.html.twig' %}
+
+
+{% block title %}Accueil - Archers du Castel{% endblock %}
+
+{% block body %}
+<style>
+.target-text {
+    position: relative;
+    font-size: 1.2rem;
+    margin: 1rem 0;
+    padding-left: 3rem; /* espace pour la cible */
+}
+
+
+</style>
+      
+
+<div class="text-center"><br>
+    <div class="text-center my-1">
+           <h1 style="color:#ED0000;  font-size:4.5rem;">
+    Bienvenue chez les "Archers du Castel"
+    </h1><br><br>
+       </div>    
+ <div class="text-center mt-4">
+     <img src="{{ asset('images/club.jpg') }}" 
+     alt="Les Archers du Castel" 
+     class="img-fluid rounded mb-2" 
+     style="max-width: 350px; width: 80%;">
+     
+       </div>      
+<h3 style="color:#ED0000; font-weight:bold; font-size:3rem;" class="label mt-1">SAISON 2024 / 2025   :  84 Adhérents</h3>
+<div class="text-center mt-4">
+    <h2 class="target-text">🏹 56 Adultes dont 38 hommes et 18 femmes 🏹</h2>
+    <h2 class="target-text">🏹28 Jeunes dont 13 garçons et 15 filles 🏹</h2>
+</div>
+</div>
+   
+    <div class="text-center mt-4">
+     <img src="{{ asset('images/salleint.png') }}" 
+     alt="Les Archers du Castel" 
+     class="img-fluid rounded mb-2" 
+     style="max-width: 2500px; width: 100%;">
+    </div>
+
+    
+</div>
+{% set popup = popup() %}
+{% if popup.enabled and popup.content %}
+<div id="popup" class="position-fixed top-50 start-50 translate-middle" 
+     style="z-index:1050; display:none; width:567px; height:567px;">
+    <div class="card shadow" 
+         style="background-image: url('/images/salle-entrainement.PNG');
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                width: 100%;
+                height: 100%;">
+                
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <span>Informations importantes</span>
+            <button type="button" class="btn-close btn-close-white" aria-label="Close"
+                    onclick="document.getElementById('popup').style.display='none'"></button>
+        </div>
+        
+        <div class="card-body"
+             style="font-size: {{ popup.fontSize ?: '1rem' }};
+                    color: {{ popup.fontColor ?: '#333' }};
+                    background: rgba(255,255,255,0.8); /* un fond semi-transparent pour bien lire le texte */
+                    height: calc(100% - 56px); /* occupe le reste de la card */
+                    overflow-y: auto;">
+            {{ popup.content|nl2br }}
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById('popup').style.display = 'block';
+</script>
+{% endif %}
+
+{% endblock %}
+

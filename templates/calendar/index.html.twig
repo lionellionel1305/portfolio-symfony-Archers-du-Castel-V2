@@ -1,0 +1,213 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1 class="mb-3">📅 Agenda</h1>
+<style>
+  /* Texte des événements */
+  .fc-event-title {
+    font-size: 0.9rem; /* augmente la taille */
+    color: #000 !important; /* texte noir */
+    font-weight: 500;
+  }
+
+  /* Texte des jours dans la grille */
+  .fc-daygrid-day-number {
+    font-size: 1.1rem;
+    color: #000;
+  }
+
+  /* Optionnel : texte du header */
+  .fc .fc-toolbar-title {
+    font-size: 1rem;
+    color: #000;
+  }
+</style>
+<!-- Agenda -->
+<div id="calendar"></div>
+
+<!-- Modal pour création/modification -->
+<div class="modal fade" id="eventModal" tabindex="-1">
+  <div class="modal-dialog">
+    <form id="eventForm" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Nouvel événement</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="eventTitle" class="form-label">Titre</label>
+          <input type="text" id="eventTitle" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label for="eventStart" class="form-label">Début</label>
+          <input type="datetime-local" id="eventStart" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label for="eventEnd" class="form-label">Fin</label>
+          <input type="datetime-local" id="eventEnd" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label for="eventCategory" class="form-label">Catégorie</label>
+          <select id="eventCategory" class="form-select">
+            <option value="Réunion">entrainement</option>
+            <option value="Perso">compétitions</option>
+            <option value="Urgent">Passage de flèches</option>
+            <option value="Autres">Autres</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        {% if is_granted('ROLE_ADMIN') %}
+          <button type="button" class="btn btn-danger" id="deleteEventBtn">Supprimer</button>
+        {% endif %}
+        {% if is_granted('ROLE_ADMIN') %}
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- FullCalendar + Bootstrap -->
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <script>
+      // ton code JS FullCalendar ici
+    </script>
+{% endblock %}
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var calendarEl = document.getElementById('calendar');
+  var eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+  var form = document.getElementById('eventForm');
+  var select = document.getElementById('eventCategory');
+  var deleteBtn = document.getElementById('deleteEventBtn');
+  var currentEvent = null;
+
+  const categoryColors = {
+    "Réunion": "#0078D4",
+    "Perso": "#107C10",
+    "Urgent": "#FF007F",
+
+    "Autres": "#605E5C"
+  };
+
+  function updateSelectColor() {
+    const value = select.value;
+    select.style.backgroundColor = categoryColors[value] || 'white';
+    select.style.color = '#fff';
+  }
+  select.addEventListener('change', updateSelectColor);
+  updateSelectColor();
+
+  var calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    locale: 'fr',
+    editable: {{ is_granted('ROLE_ADMIN') ? 'true' : 'false' }},
+    selectable: {{ is_granted('ROLE_ADMIN') ? 'true' : 'false' }},
+    events: '/api/events',
+
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+    },
+
+    select: function(info) {
+      {% if is_granted('ROLE_ADMIN') %}
+        document.getElementById('eventStart').value = info.startStr.substring(0,16);
+        document.getElementById('eventEnd').value = info.endStr ? info.endStr.substring(0,16) : '';
+        document.getElementById('eventTitle').value = '';
+        select.value = 'Réunion';
+        updateSelectColor();
+        currentEvent = null;
+        eventModal.show();
+      {% endif %}
+    },
+
+    eventClick: function(info) {
+      {% if is_granted('ROLE_ADMIN') %}
+        currentEvent = info.event;
+        document.getElementById('eventTitle').value = info.event.title;
+        document.getElementById('eventStart').value = info.event.start.toISOString().substring(0,16);
+        document.getElementById('eventEnd').value = info.event.end ? info.event.end.toISOString().substring(0,16) : '';
+
+        select.value = info.event.extendedProps.category || 'Réunion';
+        updateSelectColor();
+        eventModal.show();
+      {% endif %}
+    },
+
+    eventDrop: function(info) { {% if is_granted('ROLE_ADMIN') %} updateEvent(info.event); {% endif %} },
+    eventResize: function(info) { {% if is_granted('ROLE_ADMIN') %} updateEvent(info.event); {% endif %} },
+
+    eventDidMount: function(info) {
+      const category = info.event.extendedProps.category || 'Réunion';
+      info.el.style.backgroundColor = categoryColors[category];
+      info.el.style.borderColor = categoryColors[category];
+    }
+  });
+
+  calendar.render();
+
+  {% if is_granted('ROLE_ADMIN') %}
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    var url = '/api/events/add';
+    var method = 'POST';
+    if (currentEvent) {
+      url = '/api/events/update/' + currentEvent.id;
+      method = 'PUT';
+    }
+
+    fetch(url, {
+      method: method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: document.getElementById('eventTitle').value,
+        start: document.getElementById('eventStart').value,
+        end: document.getElementById('eventEnd').value,
+        category: select.value,
+        allDay: false
+      })
+    }).then(() => {
+      eventModal.hide();
+      calendar.refetchEvents();
+    });
+  });
+
+  deleteBtn.addEventListener('click', function() {
+    if (!currentEvent) return;
+    if (confirm("Voulez-vous vraiment supprimer cet événement ?")) {
+      fetch('/api/events/delete/' + currentEvent.id, { method: 'DELETE' })
+        .then(() => {
+          eventModal.hide();
+          calendar.refetchEvents();
+        });
+    }
+  });
+
+  function updateEvent(event) {
+    fetch('/api/events/update/' + event.id, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        start: event.start.toISOString(),
+        end: event.end ? event.end.toISOString() : null,
+        allDay: event.allDay
+      })
+    }).then(() => calendar.refetchEvents());
+  }
+  {% endif %}
+});
+</script>
+{% endblock %}

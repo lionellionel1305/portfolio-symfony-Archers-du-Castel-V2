@@ -1,0 +1,78 @@
+{% extends 'base.html.twig' %}
+{% block title %}Galerie Photos{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+  <h1 class="text-center mb-5">📸 Galerie des Archers</h1>
+
+  {% if app.user is not null and is_granted('ROLE_ADMIN') %}
+    <div class="mb-4 text-end">
+      <a href="{{ path('photo_add') }}" class="btn btn-success">➕ Ajouter une photo</a>
+    </div>
+  {% endif %}
+
+<div class="container mt-4">
+    <h2>📂📸 Albums</h2>
+
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+        {% for album in albums %}
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm">
+                    {% if album.files is not empty %}
+                        <a href="{{ path('album_show', {'id': album.id}) }}">
+                            <img src="{{ asset('uploads/albums/' ~ album.files|first) }}" class="card-img-top" alt="{{ album.name }}">
+                        </a>
+                    {% else %}
+                        <img src="{{ asset('uploads/albums/default.png') }}" class="card-img-top" alt="Pas de photo">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ album.name }}</h5>
+                        <p class="card-text">{{ album.files|length }} photo(s)</p>
+                        <a href="{{ path('album_show', {'id': album.id}) }}" class="btn btn-primary btn-sm">Voir l'album</a>
+
+                        {% if app.user is not null and is_granted('ROLE_ADMIN') %}
+                           
+
+                                <form action="{{ path('album_delete', {'id': album.id}) }}" method="post" onsubmit="return confirm('Supprimer cet album ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ album.id) }}">
+                                    <button class="btn btn-danger btn-sm">🗑 Supprimer</button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <p>Aucun album pour le moment.</p>
+        {% endfor %}
+    </div>
+</div>
+
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+    {% for photo in photos %}
+      <div class="col">
+      <h2>📸 Photos</h2>
+        <div class="card shadow-sm">
+          <img src="{{ asset('uploads/photos/' ~ photo.filename) }}" class="card-img-top" alt="{{ photo.name }}">
+          <div class="card-body text-center">
+            <h2 class="card-title">{{ photo.name }}</h2>
+            {% if app.user is not null and is_granted('ROLE_ADMIN') %}
+              <div class="d-flex justify-content-center gap-2 mt-2">
+                <a href="{{ path('photo_edit', {id: photo.id}) }}" class="btn btn-primary btn-sm">✏ Modifier</a>
+                <form action="{{ path('photo_delete', {id: photo.id}) }}" method="post" 
+                      onsubmit="return confirm('Supprimer cette photo ?');" class="d-inline">
+                  <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ photo.id) }}">
+                  <button class="btn btn-danger btn-sm">🗑 Supprimer</button>
+                </form>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <p class="text-center">Aucune photo disponible pour le moment.</p>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}

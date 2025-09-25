@@ -1,0 +1,36 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajout de photo ou d' album{% endblock %}
+
+{% block body %}
+  <div class="container mt-4">
+    <h2>➕ Ajouter une nouvelle photo</h2>
+    <form method="post" enctype="multipart/form-data" action="{{ path('photo_add') }}">
+      <div class="mb-3">
+        <label class="form-label">Nom</label>
+        <input type="text" name="name" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Fichier image</label>
+        <input type="file" name="file" class="form-control" accept="image/*" required>
+      </div>
+      <button class="btn btn-success">Enregistrer</button>
+    </form>
+  </div>
+
+  <div class="container mt-4">
+    <h2>➕ Créer un nouvel album</h2>
+    <form method="post" enctype="multipart/form-data" action="{{ path('album_add') }}">
+      <div class="mb-3">
+        <label class="form-label">Nom de l'album</label>
+        <input type="text" name="name" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Photos</label>
+        <input type="file" name="files[]" class="form-control" accept="image/*" multiple required>
+      </div>
+      <button class="btn btn-success">Créer l'album</button>
+    </form>
+  </div>
+{% endblock %}
