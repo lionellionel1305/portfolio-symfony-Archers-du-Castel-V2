@@ -32,6 +32,8 @@ et fonctionnalités sécurisées pour les administrateurs.
 ![Agenda](assets/images/agenda.PNG) 
 Le formulaire d’ajout  ou de mondification est disponible en mode administrateur.
 ![Agenda](assets/images/agenda1.PNG) 
+![Agenda](assets/images/agenda2.PNG) 
+
 
 ### 📰 Horaires 
 ![Horaires](assets/images/horaire.PNG) 
