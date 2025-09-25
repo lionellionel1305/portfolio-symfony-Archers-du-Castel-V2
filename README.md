@@ -1,4 +1,4 @@
-#🏹🏹 Les Archers Du Castel V2 🏹🏹 - Portfolio Symfony
+### <h1 align="center"> 🏹🏹 Les Archers Du Castel V2 🏹🏹 - Portfolio Symfony</h1>
 
 Site web réalisé pour le club d’archerie « Archers du Castel ». 
 Il présente les informations principales du club : 
